@@ -1,11 +1,15 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import PerevalAdded, User, Coords, Image
-from .serializers import PerevalAddedSerializer, UserSerializer, CoordsSerializer, ImageSerializer
+from .models import CustomUser, Coords, Image, PerevalAdded
+from .serializers import PerevalAddedSerializer, CustomUserSerializer, CoordsSerializer, ImageSerializer
 
 class SubmitDataView(APIView):
     def post(self, request, *args, **kwargs):
         data = request.data
+        images_data = request.FILES.getlist('images')
+
+        print("Received data:", request.data)
+
         try:
             # Проверка наличия необходимых полей в данных
             required_fields = ['beautyTitle', 'title', 'add_time', 'user', 'coords', 'images']
@@ -13,9 +17,11 @@ class SubmitDataView(APIView):
                 raise ValueError("Недостаточно обязательных полей в данных")
 
             # Создание и сохранение связанных объектов
-            user_serializer = UserSerializer(data=data['user'])
+            user_serializer = CustomUserSerializer(data=data['user'])
             coords_serializer = CoordsSerializer(data=data['coords'])
             if not user_serializer.is_valid() or not coords_serializer.is_valid():
+                print("Invalid user data:", user_serializer.errors)
+                print("Invalid coords data:", coords_serializer.errors)
                 raise ValueError("Некорректные данные для пользователя или координат")
 
             user_instance = user_serializer.save()
@@ -38,6 +44,7 @@ class SubmitDataView(APIView):
             }
             pereval_serializer = PerevalAddedSerializer(data=pereval_data)
             if not pereval_serializer.is_valid():
+                print("Invalid PerevalAdded data:", pereval_serializer.errors)
                 raise ValueError("Некорректные данные для PerevalAdded")
 
             pereval_instance = pereval_serializer.save()
@@ -48,6 +55,7 @@ class SubmitDataView(APIView):
                 image_data['pereval'] = pereval_instance.id
                 image_serializer = ImageSerializer(data=image_data)
                 if not image_serializer.is_valid():
+                    print("Invalid Image data:", image_serializer.errors)
                     raise ValueError("Некорректные данные для изображения")
                 image_serializer.save()
 
