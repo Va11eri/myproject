@@ -1,12 +1,15 @@
 from django.db import models
 
 
-class User(models.Model):
-    email = models.EmailField(primary_key=True, unique=True)
+class CustomUser(models.Model):
     fam = models.CharField(max_length=255)
     name = models.CharField(max_length=255)
     otc = models.CharField(max_length=255)
     phone = models.CharField(max_length=255)
+    email = models.EmailField(unique=True)
+
+    def __str__(self):
+        return f"{self.fam} {self.name}"
 
 
 class Coords(models.Model):
@@ -16,12 +19,6 @@ class Coords(models.Model):
     height = models.IntegerField()
 
 
-class Image(models.Model):
-    id = models.AutoField(primary_key=True)
-    data = models.ImageField(upload_to='images/')
-    title = models.CharField(max_length=255)
-
-
 class PerevalAdded(models.Model):
     id = models.AutoField(primary_key=True)
     beautyTitle = models.CharField(max_length=255)
@@ -29,13 +26,12 @@ class PerevalAdded(models.Model):
     other_titles = models.CharField(max_length=255)
     connect = models.TextField(blank=True)
     add_time = models.DateTimeField()
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     coords = models.ForeignKey(Coords, on_delete=models.CASCADE)
     winter_level = models.CharField(max_length=255, blank=True)
     summer_level = models.CharField(max_length=255, blank=True)
     autumn_level = models.CharField(max_length=255, blank=True)
     spring_level = models.CharField(max_length=255, blank=True)
-    images = models.ManyToManyField(Image, through='PerevalImages')
     status = models.CharField(
         max_length=255,
         choices=(
@@ -50,6 +46,13 @@ class PerevalAdded(models.Model):
         db_table = 'pereval_added'
 
 
+class Images(models.Model):
+    id = models.AutoField(primary_key=True)
+    data = models.ImageField(upload_to='images/')
+    title = models.CharField(max_length=255)
+    pereval = models.ForeignKey('PerevalAdded', on_delete=models.CASCADE)
+
+
 class PerevalAreas(models.Model):
     id = models.AutoField(primary_key=True)
     id_parent = models.BigIntegerField()
@@ -57,15 +60,6 @@ class PerevalAreas(models.Model):
 
     class Meta:
         db_table = 'pereval_areas'
-
-
-class PerevalImages(models.Model):
-    id = models.AutoField(primary_key=True)
-    pereval = models.ForeignKey(PerevalAdded, on_delete=models.CASCADE)
-    image = models.ForeignKey(Image, on_delete=models.CASCADE)
-
-    class Meta:
-        db_table = 'pereval_images'
 
 
 class SprActivitiesTypes(models.Model):

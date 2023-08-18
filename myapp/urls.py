@@ -1,6 +1,7 @@
 from django.urls import path
-from .views import SubmitDataView
+from .views import SubmitData, SubmitDetailData
 
 urlpatterns = [
-    path('submit-data/', SubmitDataView.as_view(), name='submit-data'),
+    path('submitData/', SubmitData.as_view(), name='submitData'),
+    path('submitData/<int:pk>/', SubmitDetailData.as_view(), name='SubmitDetailData')
 ]
