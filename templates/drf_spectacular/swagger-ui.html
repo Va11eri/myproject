@@ -1,0 +1,19 @@
+{% block content %}
+<div id="swagger-ui"></div>
+<script>
+    window.onload = function() {
+        const ui = SwaggerUIBundle({
+            url: "{% url 'schema-swagger-ui' %}",
+            dom_id: '#swagger-ui',
+            deepLinking: true,
+            presets: [
+                SwaggerUIBundle.presets.apis,
+                SwaggerUIStandalonePreset,
+            ],
+            plugins: [
+                SwaggerUIBundle.plugins.DownloadUrl,
+            ],
+        })
+    }
+</script>
+{% endblock %}
